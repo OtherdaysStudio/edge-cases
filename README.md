@@ -85,11 +85,7 @@ The [skills CLI](https://github.com/vercel-labs/skills) asks which agent to inst
 npx skills add OtherdaysStudio/edge-cases -g -a claude-code -y
 ```
 
-Or clone it by hand:
-
-```bash
-git clone https://github.com/OtherdaysStudio/edge-cases ~/.claude/skills/edge-cases
-```
+The repo holds two skills, `edge-cases` and `edge-cases-backfill`. The command installs both. To take one, add `--skill edge-cases`.
 
 ## Use
 
@@ -99,11 +95,33 @@ Give the agent a feature idea. A vague one is fine:
 
 The skill loads when the idea adds or changes an interaction. You can also name it: "run edge-cases on this first".
 
+## Backfill: the bugs that already shipped
+
+`edge-cases` works on a feature you have not built yet. `/edge-cases-backfill` works on the code you have.
+
+```
+/edge-cases-backfill the composer
+```
+
+Name a surface or a folder. With no name, the agent lists the product's surfaces and takes them one at a time.
+
+The agent reads only. It does this:
+
+1. Finds every place in the code that claims an input: key handlers, global hotkeys and event taps, pointer and drop handlers, voice and system events.
+2. Keeps each input with two or more owners, and each key that no one claims and that falls through to another app.
+3. Lists everything that takes time to finish: a drag, a recording, a load, a send.
+4. Crosses the two lists and reads who receives the press first. An order that a guard states is fine. An order that happens by accident is a finding.
+5. Follows each cancel and discard to the work it claims to end. A discard that hides the view while the send still runs is a finding.
+6. Finds every line that drops the person's content, and checks for a copy or an undo.
+7. Reads each candidate again and drops the ones a guard already handles.
+
+You receive up to 15 findings, the worst loss first. Each has the steps a person takes, what happens, what they meant, the file and line of each owner, and a proposed decision. Each is marked "confirmed by reading" or "unproven". An unproven finding depends on the operating system, so play it in the running app before anyone fixes it.
+
 ## After the build
 
 - Each collision line is one test.
 - Play each collision and each "unproven" line in the running app.
-- When a bug ships anyway, add one question to step 3 of `SKILL.md`. The skill then knows about that kind of bug for good.
+- When a bug ships anyway, add one question to step 3 of `skills/edge-cases/SKILL.md`. The skill then knows about that kind of bug for good.
 
 ## How it was tested
 
